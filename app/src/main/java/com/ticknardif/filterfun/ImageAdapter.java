@@ -19,15 +19,15 @@ package com.ticknardif.filterfun;
 
 public class ImageAdapter extends BaseAdapter {
     private Context context;
-    private ArrayList<String> images;
+    private ArrayList<File> images;
 
     public ImageAdapter(Context c) {
         context = c;
-        images = new ArrayList<String>();
+        images = new ArrayList<File>();
     }
 
-    public void add(String path) {
-        images.add(path);
+    public void add(File file) {
+        images.add(file);
     }
 
     public void clear() {
@@ -44,7 +44,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     @Override
-    public String getItem(int position) {
+    public File getItem(int position) {
         return images.get(position);
     }
 
@@ -69,7 +69,7 @@ public class ImageAdapter extends BaseAdapter {
             imageView = (ImageView) convertView;
         }
 
-        Bitmap bitmap = decodeSampledBitmapFromUri(images.get(position), IMAGE_WIDTH, IMAGE_HEIGHT);
+        Bitmap bitmap = decodeSampledBitmapFromUri(images.get(position).getAbsolutePath(), IMAGE_WIDTH, IMAGE_HEIGHT);
         imageView.setImageBitmap(bitmap);
 
         return imageView;
@@ -96,7 +96,7 @@ public class ImageAdapter extends BaseAdapter {
 
     public static int calculateInSampleSize(
 
-            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
         final int height = options.outHeight;
         final int width = options.outWidth;

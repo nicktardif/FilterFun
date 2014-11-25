@@ -3,19 +3,27 @@ package com.ticknardif.filterfun;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapRegionDecoder;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.media.effect.Effect;
 import android.media.effect.EffectContext;
 import android.media.effect.EffectFactory;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.AlarmClock;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.Buffer;
@@ -25,6 +33,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class InspectActivity extends Activity {
+    public Bitmap bitmap;
+    public int width = 0;
+    public int height = 0;
+    public ImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,72 +45,53 @@ public class InspectActivity extends Activity {
 
         List<Runnable> functions =new ArrayList<Runnable>();
         Bundle bundle = getIntent().getExtras();
-        String imagePath = bundle.getString("imagePath");
-        Log.d("Debug", "ImagePath is " + imagePath);
+        File file = new File(bundle.getString("filePath"));
+        Log.d("Debug", "ImagePath is " + file.getAbsolutePath());
 
-        ImageView imageView = (ImageView) findViewById(R.id.inspect_image);
+        imageView = (ImageView) findViewById(R.id.inspect_image);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
 
-        int width = size.x;
-        int height = size.y;
+        width = size.x;
+        height = size.y;
 
-        Bitmap immutableBM = ImageAdapter.decodeSampledBitmapFromUri(imagePath, width, height);
-
-        final Bitmap bitmap = immutableBM.copy(Bitmap.Config.ARGB_8888, true);
-
-        functions.add(new Runnable() {
-            public void run() {
-                Filter.redFilter(bitmap);
-            }
-        });
-        functions.add(new Runnable() {
-            public void run() {
-                Filter.blueFilter(bitmap);
-            }
-        });
-        functions.add(new Runnable() {
-            public void run() {
-                Filter.greenFilter(bitmap);
-            }
-        });
-        functions.add(new Runnable() {
-            public void run() {
-                Filter.BlackWhiteFilter(bitmap);
-            }
-        });
-        functions.add(new Runnable() {
-            public void run() {
-                Filter.RainbowFilter(bitmap);
-            }
-        });
-
-        Collections.shuffle(functions);
-        functions.get(0).run();
-
+        bitmap = ImageAdapter.decodeSampledBitmapFromUri(file.getAbsolutePath(), width, height);
         imageView.setImageBitmap(bitmap);
 
-        saveImage(imagePath, bitmap);
-    }
-    public void saveImage(String imagePath, Bitmap bitmap) {
-        FileOutputStream out = null;
-        try {
-            out = new FileOutputStream(imagePath);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
-            // PNG is a lossless format, the compression factor (100) is ignored
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (out != null) {
-                    out.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                ImageView imageView = (ImageView) view;
+
+                // Run an async task to process the full image in the background
+                // The result of this will overwrite the "quicker" image processing that is done below
+                ProcessImageAsync processImageAsync = new ProcessImageAsync(imageView, bitmap, InspectActivity.this);
+                processImageAsync.execute(bitmap);
+
+                long start = System.currentTimeMillis();
+
+                // Create mutable bitmap
+                // Scale down the size for quicker computations
+                Bitmap mutable = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 4, bitmap.getHeight() / 4, false);
+
+                long end = System.currentTimeMillis();
+
+                long elapsed = end - start;
+                Log.d("Debug", "Bitmap copying took " + Double.toString(elapsed / 1000.0) + " seconds.");
+
+                start = System.currentTimeMillis();
+                Filter.RainbowFilter(mutable);
+                end = System.currentTimeMillis();
+
+                elapsed = end - start;
+                Log.d("Debug", "Image processing took " + Double.toString(elapsed / 1000.0) + " seconds.");
+
+                imageView.setImageBitmap(mutable);
             }
-        }
+        });
     }
 
 
@@ -122,4 +115,9 @@ public class InspectActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
 }
+
