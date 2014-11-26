@@ -27,7 +27,12 @@ class ProcessImageAsync extends AsyncTask<Bitmap, Void, Bitmap> {
         // Create a mutable version of the bitmap
         Bitmap mutable = bitmap[0].copy(Bitmap.Config.ARGB_8888, true);
 
+        long start = System.currentTimeMillis();
         filter.filter(mutable);
+        long end = System.currentTimeMillis();
+
+        long elapsed = end - start;
+        Log.d("Debug", "Full image processing took " + Double.toString(elapsed / 1000.0) + " seconds.");
 
         return mutable;
     }
