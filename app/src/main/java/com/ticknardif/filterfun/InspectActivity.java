@@ -2,19 +2,8 @@ package com.ticknardif.filterfun;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapRegionDecoder;
-import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.Rect;
-import android.media.effect.Effect;
-import android.media.effect.EffectContext;
-import android.media.effect.EffectFactory;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.AlarmClock;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Display;
 import android.view.Menu;
@@ -22,21 +11,23 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import Filters.BlackWhiteFilter;
+import Filters.BlueFilter;
+import Filters.Filter;
+import Filters.GreenFilter;
+import Filters.RainbowFilter;
+import Filters.RedFilter;
 
 public class InspectActivity extends Activity {
     public Bitmap bitmap;
     public int width = 0;
     public int height = 0;
     public ImageView imageView;
+    public List<Filter> filters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +51,28 @@ public class InspectActivity extends Activity {
         bitmap = ImageAdapter.decodeSampledBitmapFromUri(file.getAbsolutePath(), width, height);
         imageView.setImageBitmap(bitmap);
 
+        filters = new ArrayList<Filter>();
+        filters.add(new RedFilter());
+        filters.add(new GreenFilter());
+        filters.add(new BlueFilter());
+        filters.add(new BlackWhiteFilter());
+        filters.add(new RainbowFilter());
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 ImageView imageView = (ImageView) view;
 
+                // Choose a random filter
+                int numFilters = filters.size();
+                int chosenNumber = (int) (Math.random() * numFilters);
+                Log.d("Debug", Integer.toString(chosenNumber));
+                Filter filter = filters.get(chosenNumber);
+
                 // Run an async task to process the full image in the background
                 // The result of this will overwrite the "quicker" image processing that is done below
-                ProcessImageAsync processImageAsync = new ProcessImageAsync(imageView, bitmap, InspectActivity.this);
+                ProcessImageAsync processImageAsync = new ProcessImageAsync(imageView, bitmap, InspectActivity.this, filter);
                 processImageAsync.execute(bitmap);
 
                 long start = System.currentTimeMillis();
@@ -83,13 +87,16 @@ public class InspectActivity extends Activity {
                 Log.d("Debug", "Bitmap copying took " + Double.toString(elapsed / 1000.0) + " seconds.");
 
                 start = System.currentTimeMillis();
-                Filter.RainbowFilter(mutable);
+
+                filter.filter(mutable);
+
                 end = System.currentTimeMillis();
 
                 elapsed = end - start;
                 Log.d("Debug", "Image processing took " + Double.toString(elapsed / 1000.0) + " seconds.");
 
                 imageView.setImageBitmap(mutable);
+                Log.d("Debug", "Done with UI thread");
             }
         });
     }
