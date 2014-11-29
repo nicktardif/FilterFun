@@ -1,7 +1,6 @@
 package Filters;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 public class RainbowFilter extends Filter {
     private int value;
@@ -30,14 +29,16 @@ public class RainbowFilter extends Filter {
             int b = rainbowCalc(x, bBase);
 
             for(int y = 0; y < bitmap.getHeight(); y++) {
-                bitmap.setPixel(x, y, Color.argb(
-                    255,
-                    (   r + (( pixels[y * stride + x] >> 16)    & 0xFF)) / 2,
-                    (   g + (( pixels[y * stride + x] >> 8)     & 0xFF)) / 2,
-                    (   b + (  pixels[y * stride + x]           & 0xFF)) / 2
-                ));
+                int pixel = pixels[y * stride + x];
+
+                pixels[y * stride + x] =
+                    0xFF000000 |
+                    (((r + (( pixel >> 16)    & 0xFF)) / 2) << 16) |
+                    (((g + (( pixel >>  8)    & 0xFF)) / 2) << 8) |
+                    (((b + (( pixel >>  0)    & 0xFF)) / 2) << 0);
             }
         }
+        bitmap.setPixels(pixels, 0, stride, 0, 0, stride, height);
         return bitmap;
     }
 

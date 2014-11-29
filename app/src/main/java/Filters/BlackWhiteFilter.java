@@ -1,7 +1,6 @@
 package Filters;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 
 public class BlackWhiteFilter extends Filter {
     public Bitmap filter(Bitmap bitmap) {
@@ -16,10 +15,12 @@ public class BlackWhiteFilter extends Filter {
                 int weightedG = (int) (0.59 *   (float) ((pixels[y * stride + x] >> 8  ) & 0xFF));
                 int weightedB = (int) (0.11 *   (float) ((pixels[y * stride + x]       ) & 0xFF));
 
-                bitmap.setPixel(x, y, Color.argb(weightedR + weightedG + weightedB, 255, 255, 255));
+                pixels[y * stride + x] =
+                        0x00FFFFFF | ((weightedR + weightedG + weightedB) << 24);
             }
         }
 
+        bitmap.setPixels(pixels, 0, stride, 0, 0, stride, height);
         return bitmap;
     }
 }
