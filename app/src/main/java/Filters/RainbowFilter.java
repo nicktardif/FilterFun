@@ -4,21 +4,26 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 
 public class RainbowFilter extends Filter {
-    private int value = 50;
-    private int spacing = 300;
-    private int range = 100;
+    private int value;
+    private int spacing;
+    private int range;
 
     public Bitmap filter(Bitmap bitmap) {
         int stride = bitmap.getWidth();
         int height = bitmap.getHeight();
+
+        value = 50;
+        spacing = stride / 3;
+        range = spacing / 3;
+
         int[] pixels = new int[bitmap.getWidth() * height];
         bitmap.getPixels(pixels, 0, stride, 0, 0, stride, height);
 
-        for(int x = 0; x < bitmap.getWidth(); x++) {
+        int rBase = 1 * range;
+        int gBase = 2 * range;
+        int bBase = 3 * range;
 
-            int rBase = 100;
-            int gBase = 200;
-            int bBase = 300;
+        for(int x = 0; x < bitmap.getWidth(); x++) {
 
             int r = rainbowCalc(x, rBase);
             int g = rainbowCalc(x, gBase);

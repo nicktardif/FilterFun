@@ -74,29 +74,6 @@ public class InspectActivity extends Activity {
                 // The result of this will overwrite the "quicker" image processing that is done below
                 ProcessImageAsync processImageAsync = new ProcessImageAsync(imageView, bitmap, InspectActivity.this, filter);
                 processImageAsync.execute(bitmap);
-
-                long start = System.currentTimeMillis();
-
-                // Create mutable bitmap
-                // Scale down the size for quicker computations
-                Bitmap mutable = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth() / 4, bitmap.getHeight() / 4, false);
-
-                long end = System.currentTimeMillis();
-
-                long elapsed = end - start;
-                Log.d("Debug", "Bitmap copying took " + Double.toString(elapsed / 1000.0) + " seconds.");
-
-                start = System.currentTimeMillis();
-
-                filter.filter(mutable);
-
-                end = System.currentTimeMillis();
-
-                elapsed = end - start;
-                Log.d("Debug", "Image processing took " + Double.toString(elapsed / 1000.0) + " seconds.");
-
-                imageView.setImageBitmap(mutable);
-                Log.d("Debug", "Done with UI thread");
             }
         });
     }
