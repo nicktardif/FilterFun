@@ -7,6 +7,10 @@ public class RainbowFilter extends Filter {
     private int spacing;
     private int range;
 
+    public RainbowFilter() {
+        this.name = "Rainbow";
+    }
+
     public Bitmap filter(Bitmap bitmap) {
         int stride = bitmap.getWidth();
         int height = bitmap.getHeight();

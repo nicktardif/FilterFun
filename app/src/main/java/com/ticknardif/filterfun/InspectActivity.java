@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public class InspectActivity extends Activity {
     public int height = 0;
     public ImageView imageView;
     public List<Filter> filters;
+    public Toast toast;
+    public int toastDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +41,8 @@ public class InspectActivity extends Activity {
         Bundle bundle = getIntent().getExtras();
         File file = new File(bundle.getString("filePath"));
         Log.d("Debug", "ImagePath is " + file.getAbsolutePath());
+
+        toastDuration = Toast.LENGTH_SHORT;
 
         imageView = (ImageView) findViewById(R.id.inspect_image);
 
@@ -74,6 +79,8 @@ public class InspectActivity extends Activity {
                 // The result of this will overwrite the "quicker" image processing that is done below
                 ProcessImageAsync processImageAsync = new ProcessImageAsync(imageView, bitmap, InspectActivity.this, filter);
                 processImageAsync.execute(bitmap);
+
+                showToast(filter.name);
             }
         });
     }
@@ -102,6 +109,18 @@ public class InspectActivity extends Activity {
 
     public void setBitmap(Bitmap bitmap) {
         this.bitmap = bitmap;
+    }
+
+    public void showToast(String filterName) {
+        // Cancel the previous toast if it exists
+        if(toast != null)
+            toast.cancel();
+
+        String text = "Applying " + filterName + " filter!";
+
+        // Make the new toast
+        toast = Toast.makeText(getBaseContext(), text, toastDuration);
+        toast.show();
     }
 }
 

@@ -3,6 +3,11 @@ package Filters;
 import android.graphics.Bitmap;
 
 public class GreenFilter extends Filter {
+
+    public GreenFilter() {
+        this.name = "Green";
+    }
+
     public Bitmap filter(Bitmap bitmap) {
         int stride = bitmap.getWidth();
         int height = bitmap.getHeight();

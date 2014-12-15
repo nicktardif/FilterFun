@@ -3,6 +3,11 @@ package Filters;
 import android.graphics.Bitmap;
 
 public class BlackWhiteFilter extends Filter {
+
+    public BlackWhiteFilter() {
+        this.name = "Black and White";
+    }
+
     public Bitmap filter(Bitmap bitmap) {
         int stride = bitmap.getWidth();
         int height = bitmap.getHeight();
