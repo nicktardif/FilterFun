@@ -5,8 +5,9 @@
     android:layout_height="match_parent"
     android:columnWidth="90dip"
     android:numColumns="auto_fit"
-    android:verticalSpacing="10dip"
-    android:horizontalSpacing="10dip"
+    android:verticalSpacing="4dip"
+    android:horizontalSpacing="2dip"
+    android:background="#333"
     android:padding="10dip"
     android:gravity="center">
 </GridView>

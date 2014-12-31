@@ -2,8 +2,6 @@ package com.ticknardif.filterfun;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -31,7 +29,7 @@ public class MainActivity extends Activity {
 
         List<File> filenames = getAlbumStorageDir("Camera");
 
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 50; i++) {
             File file = filenames.get(i);
             Log.d(LOG_TAG, "Filename to be added: " + file.getAbsolutePath());
             adapter.add(file);
